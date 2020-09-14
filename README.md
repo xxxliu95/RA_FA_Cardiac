@@ -13,6 +13,7 @@ This repository contains the official PyTorch implementation of the Resolution A
 * CUDA toolkit 10 or newer
 
 # SDNet
+In this repository, we train a SDNet [code](https://github.com/agis85/anatomy_modality_decomposition), [paper](https://arxiv.org/pdf/1903.09467.pdf) with our proposed Resolution Augmentation and Factor-based Augmentation in a semi-supervised manner.
 
 ![SDNet](./images/sdnet.jpg)
 
