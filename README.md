@@ -21,6 +21,10 @@ We propose to use random resampling to augment the original dataset such that th
 # Factor-based Augmentation
 We first pre-train a SDNet model to extract the anatomy and modality factors. Then mix the anatomy and modality factors to generate new images.
 
+# Usage
+To train the model, run the following command:
+```python train -e 50 -bs 4 -g 0```
+
 # Citation
 If you find our metrics useful please cite the following paper:
 ```
