@@ -26,7 +26,7 @@ We first pre-train a SDNet model to extract the anatomy and modality factors. Th
 # Usage
 To train the model, run the following command:
 
-```python train -e 50 -bs 4 -g 0```
+```python train.py -e 50 -bs 4 -g 0```
 
 # Citation
 If you find our metrics useful please cite the following paper:
