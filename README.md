@@ -6,7 +6,7 @@
 
 [Xiao Liu](https://github.com/xxxliu95), [Spyridon Thermos](https://github.com/spthermo), [Agisilaos Chartsias](https://github.com/agis85), [Alison O'Neil](https://www.eng.ed.ac.uk/about/people/dr-alison-oneil), and [Sotirios A. Tsaftaris](https://www.eng.ed.ac.uk/about/people/dr-sotirios-tsaftaris). In [M&Ms Challenge](https://www.ub.edu/mnms/) of [STACOM 2020](http://stacom2020.cardiacatlas.org/).
 
-This repository contains the official PyTorch implementation of the Resolution Augmentation (RA) and Factor-based Augmentation (FA) methods proposed in Disentangled Representations for Domain-generalized Cardiac Segmentation [https://arxiv.org/abs/2008.11514].
+This repository contains the official PyTorch implementation of the Resolution Augmentation (RA) and Factor-based Augmentation (FA) methods proposed in [Disentangled Representations for Domain-generalized Cardiac Segmentation] (https://arxiv.org/abs/2008.11514).
 
 The repository is created by [Xiao Liu](https://github.com/xxxliu95)__\*__, [Spyridon Thermos](https://github.com/spthermo)__\*__, [Agisilaos Chartsias](https://github.com/agis85), [Alison O'Neil](https://www.eng.ed.ac.uk/about/people/dr-alison-oneil), and [Sotirios A. Tsaftaris](https://www.eng.ed.ac.uk/about/people/dr-sotirios-tsaftaris), as a result of the collaboration between [The University of Edinburgh](https://www.eng.ed.ac.uk/) and [Canon Medical Systems Europe](https://eu.medical.canon/).
 
