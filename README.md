@@ -2,7 +2,7 @@
 
 ![overview](./assets/images/overview.png)
 
-**Disentangled Representations for Domain-generalized Cardiac Segmentation**[[Paper]](https://arxiv.org/abs/2008.11514).
+**Disentangled Representations for Domain-generalized Cardiac Segmentation** [[Paper]](https://arxiv.org/abs/2008.11514).
 
 This repository contains the official PyTorch implementation of the Resolution Augmentation (RA) and Factor-based Augmentation (FA) methods proposed in Disentangled Representations for Domain-generalized Cardiac Segmentation [https://arxiv.org/abs/2008.11514].
 
