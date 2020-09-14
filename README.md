@@ -14,6 +14,10 @@ This repository contains the official PyTorch implementation of the Resolution A
 * SciPy 1.5.2 or higher
 * CUDA toolkit 10 or newer
 
+# SDNet
+
+![SDNet](./assets/images/sdnet.png)
+
 # Resolution Augmentation
 
 run the following command:
