@@ -15,21 +15,11 @@ This repository contains the official PyTorch implementation of the Resolution A
 # SDNet
 In this repository, we train a SDNet [[code](https://github.com/agis85/anatomy_modality_decomposition), [paper]](https://arxiv.org/pdf/1903.09467.pdf) with our proposed Resolution Augmentation and Factor-based Augmentation in a semi-supervised manner.
 
-![SDNet](./images/sdnet.jpg)
-
 # Resolution Augmentation
-
-run the following command:
-
-```python compute_DC.py --root <path/to/extracted/tensors/and/vectors> --save </name/of/result/file>```
+We propose to use random resampling to augment the original dataset such that the resolutions of all the data are equally distributed in a certain range.
 
 # Factor-based Augmentation
-
-![FA](./images/FA.jpg)
-
-run the following command:
-
-```python compute_IOB.py --root <path/to/extracted/tensors/and/vectors> --gpu <gpu_id> --save </name/of/result/file> ```
+We first pre-train a SDNet model to extract the anatomy and modality factors. Then mix the anatomy and modality factors to generate new images.
 
 # Citation
 If you find our metrics useful please cite the following paper:
