@@ -1,7 +1,5 @@
 # RA_FA_Cardiac
 
-![overview](./assets/images/overview.png)
-
 **Disentangled Representations for Domain-generalized Cardiac Segmentation** [[Paper]](https://arxiv.org/abs/2008.11514). In [M&Ms Challenge](https://www.ub.edu/mnms/) of [STACOM 2020](http://stacom2020.cardiacatlas.org/).
 
 The repository is created by [Xiao Liu](https://github.com/xxxliu95), [Spyridon Thermos](https://github.com/spthermo), [Agisilaos Chartsias](https://github.com/agis85), [Alison O'Neil](https://www.eng.ed.ac.uk/about/people/dr-alison-oneil), and [Sotirios A. Tsaftaris](https://www.eng.ed.ac.uk/about/people/dr-sotirios-tsaftaris), as a result of the collaboration between [The University of Edinburgh](https://www.eng.ed.ac.uk/) and [Canon Medical Systems Europe](https://eu.medical.canon/). 
@@ -25,6 +23,8 @@ run the following command:
 ```python compute_DC.py --root <path/to/extracted/tensors/and/vectors> --save </name/of/result/file>```
 
 # Factor-based Augmentation
+
+![FA](./images/FA.jpg)
 
 run the following command:
 
