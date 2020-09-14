@@ -10,6 +10,8 @@ This repository contains the official PyTorch implementation of the Resolution A
 * Pytorch 1.5.1 or higher with GPU support
 * Python 3.7.2 or higher
 * SciPy 1.5.2 or higher
+* tqdm
+* logging
 * CUDA toolkit 10 or newer
 
 # SDNet
