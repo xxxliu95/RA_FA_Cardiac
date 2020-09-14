@@ -7,6 +7,7 @@ from focal_loss import FocalLoss
 from torch.utils.data import DataLoader, random_split
 
 from mms_dataloader_re_aug import get_all_data_loaders
+from un_dataloader import get_un_data_loaders
 import models
 import supervision
 import torch
@@ -65,17 +66,27 @@ def train_net(device,
     models.initialize_weights(model, args.weight_init)
     model.to(device)
 
+    pre_trained_model = models.get_model(args.model_name, model_params)
+    pre_trained_model.load_state_dict(torch.load('pre_trained_model/CP_epoch50.pth', map_location=device))
+    pre_trained_model.to(device)
+
     train_loader, train_data = get_all_data_loaders(batch_size)
+    un_loader, un_data = get_un_data_loaders(batch_size)
 
-
-    n_val = int(len(train_data) * val_percent)
+    # n_val = int(len(train_data) * val_percent)
+    n_val = int(len(train_data))
     n_train = len(train_data)
-    train, val = random_split(train_data, [n_train-n_val, n_val])
-    val_loader = DataLoader(val, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=False, drop_last=True)
+    # train, val = random_split(train_data, [n_train-n_val, n_val])
+    val_loader = DataLoader(train_data, batch_size=batch_size, shuffle=False, num_workers=8, pin_memory=False, drop_last=True)
+
+    n_un_train = len(un_data)
+    # k_itr = n_un_train // n_train
+    k_itr = 1
 
     l1_distance = nn.L1Loss().to(device)
     writer = SummaryWriter(comment=f'LR_{lr}_BS_{batch_size}')
     global_step = 0
+    un_step = 0
 
     logging.info(f'''Starting training:
         Epochs:          {epochs}
@@ -96,9 +107,11 @@ def train_net(device,
 
     for epoch in range(epochs):
         model.train()
+        pre_trained_model.eval()
 
         epoch_loss = 0
         with tqdm(total=n_train, desc=f'Epoch {epoch + 1}/{epochs}', unit='img') as pbar:
+            un_itr = iter(un_loader)
             for imgs, true_masks in train_loader:
 
                 imgs = imgs.to(device=device, dtype=torch.float32)
@@ -134,6 +147,72 @@ def train_net(device,
                 loss.backward()
                 nn.utils.clip_grad_value_(model.parameters(), 0.1)
                 optimizer.step()
+
+
+
+                for i in range(k_itr // 10):
+                    un_imgs = next(un_itr)
+                    un_imgs = un_imgs.to(device=device, dtype=torch.float32)
+
+                    un_reco, un_z_out, un_mu_tilde, un_a_out, un_masks_pred, un_mu, un_logvar = model(un_imgs, true_masks, 'training')
+
+                    un_reco_loss = l1_distance(un_reco, un_imgs)
+                    un_regression_loss = l1_distance(un_mu_tilde, un_z_out)
+
+                    un_batch_loss = un_reco_loss + un_regression_loss
+
+                    optimizer.zero_grad()
+                    un_batch_loss.backward()
+                    nn.utils.clip_grad_value_(model.parameters(), 0.1)
+                    optimizer.step()
+
+                    writer.add_scalar('Loss_un/un_reco_loss', un_reco_loss.item(), un_step)
+                    writer.add_scalar('Loss_un/un_regression_loss', un_regression_loss.item(), un_step)
+                    writer.add_scalar('Loss_un/un_batch_loss', un_batch_loss.item(), un_step)
+
+                    with torch.no_grad():
+                        _, _, _, pre_a_out, _, _, _ = pre_trained_model(imgs, true_masks, 'test')
+                        _, pre_z_out, _, _, _, _, _ = pre_trained_model(un_imgs, true_masks, 'test')
+                        pre_imgs, _, _, _, _, _, _ = pre_trained_model(imgs, true_masks, 'test', a_in=pre_a_out, z_in=pre_z_out)
+
+                    IA_reco, IA_z_out, IA_mu_tilde, IA_a_out, IA_masks_pred, IA_mu, IA_logvar = model(pre_imgs, true_masks, 'training')
+
+                    IA_dice_loss_lv = supervision.dice_loss(IA_masks_pred[:, 0, :, :], true_masks[:, 0, :, :])
+                    IA_dice_loss_myo = supervision.dice_loss(IA_masks_pred[:, 1, :, :], true_masks[:, 1, :, :])
+                    IA_dice_loss_rv = supervision.dice_loss(IA_masks_pred[:, 2, :, :], true_masks[:, 2, :, :])
+                    IA_dice_loss_bg = supervision.dice_loss(IA_masks_pred[:, 3, :, :], true_masks[:, 3, :, :])
+                    IA_loss_dice = IA_dice_loss_lv + IA_dice_loss_myo + IA_dice_loss_rv + IA_dice_loss_bg
+                    IA_loss_focal = focal(IA_masks_pred[:, 0:3, :, :], true_masks[:, 0:3, :, :])
+
+                    IA_reco_loss = l1_distance(IA_reco, pre_imgs)
+                    IA_regression_loss = l1_distance(IA_mu_tilde, IA_z_out)
+
+                    IA_batch_loss = IA_reco_loss + IA_regression_loss + IA_loss_dice + IA_loss_focal
+
+                    optimizer.zero_grad()
+                    IA_batch_loss.backward()
+                    nn.utils.clip_grad_value_(model.parameters(), 0.1)
+                    optimizer.step()
+
+                    writer.add_scalar('Loss_IA/IA_loss_dice', IA_loss_dice.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_dice_loss_lv', IA_dice_loss_lv.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_dice_loss_myo', IA_dice_loss_myo.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_dice_loss_rv', IA_dice_loss_rv.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_dice_loss_bg', IA_dice_loss_bg.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_loss_focal', IA_loss_focal.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_regression_loss', IA_regression_loss.item(), un_step)
+                    writer.add_scalar('Loss_IA/IA_reco_loss', IA_reco_loss.item(), un_step)
+
+
+                    if global_step % (len(train_data) // (2 * batch_size)) == 0:
+                        writer.add_images('unlabelled/train_un_img', un_imgs, global_step)
+                        writer.add_images('unlabelled/train_un_mask', un_masks_pred[:, 0:3, :, :] > 0.5, global_step)
+                        writer.add_images('IA/train_IA_ana_img', imgs*0.5+0.5, global_step)
+                        writer.add_images('IA/train_IA_mod_img', un_imgs*0.5+0.5, global_step)
+                        writer.add_images('IA/train_IA_img', pre_imgs*0.5+0.5, global_step)
+                        writer.add_images('IA/train_IA_mask_true', true_masks[:, 0:3, :, :], global_step)
+                        writer.add_images('IA/train_IA_mask_pred', IA_masks_pred[:, 0:3, :, :] > 0.5, global_step)
+                    un_step += 1
 
                 pbar.update(imgs.shape[0])
                 global_step += 1
