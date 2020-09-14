@@ -16,7 +16,7 @@ This repository contains the official PyTorch implementation of the Resolution A
 
 # SDNet
 
-![SDNet](./assets/images/sdnet.jpg)
+![SDNet](/assets/images/sdnet.jpg)
 
 # Resolution Augmentation
 
