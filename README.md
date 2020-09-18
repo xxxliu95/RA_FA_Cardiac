@@ -29,7 +29,7 @@ To train the model, run the following command:
 ```python train.py -e 50 -bs 4 -g 0```
 
 # Citation
-If you find our metrics useful please cite the following paper:
+If you find our method useful please cite the following paper:
 ```
 @article{liu2020disentangled,
   title={Disentangled Representations for Domain-generalized Cardiac Segmentation},
